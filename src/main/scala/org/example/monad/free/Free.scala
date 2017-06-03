@@ -2,7 +2,9 @@ package org.example.monad.free
 
 import scala.language.higherKinds
 
-object BareBones {
+object Free {
+  type Id[A] = A
+
   // Monad definition
   trait Monad[M[_]] {
     def pure[A](a: A): M[A]
@@ -39,4 +41,7 @@ object BareBones {
   // Free monad algebra
   case class Return[F[_], A](a: A) extends FreeB[F, A]
   case class Bind[F[_], I, A](a: F[I], f: I => FreeB[F, A]) extends FreeB[F, A]
+
+  def pure[S[_], A](a: A): FreeB[S, A] = Return[S, A](a)
+  def liftF[F[_], A](value: F[A]): FreeB[F, A] = ???
 }

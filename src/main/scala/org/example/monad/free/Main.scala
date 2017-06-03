@@ -1,7 +1,5 @@
 package org.example.monad.free
 
-import cats.implicits._
-
 object Main {
   val program = {
     import Lifting._
@@ -16,6 +14,6 @@ object Main {
 
   def main(args: Array[String]): Unit = {
     val startPosition = Position(0.0, 0.0, Degree(0))
-    val _ = program(startPosition).foldMap(InterpreterOpt)
+    val _ = program(startPosition).foldMap(InterpreterId)
   }
 }
