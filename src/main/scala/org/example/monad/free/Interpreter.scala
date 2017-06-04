@@ -4,7 +4,6 @@ import Free.{Id, ~>}
 import Computations._
 
 object InterpreterId extends (Instruction ~> Id) {
-
   override def apply[A](fa: Instruction[A]): Id[A] = fa match {
     case Forward(p, length) => forward(p, length)
     case Backward(p, length) => backward(p, length)
