@@ -16,8 +16,14 @@ object Free {
   type Id[A] = A
 
   implicit val identityMonad: Monad[Id] = new Monad[Id] {
-    override def pure[A](a: A): Id[A] = a
-    override def flatMap[A, B](a: Id[A])(f: (A) => Id[B]): Id[B] = f(a)
+    override def pure[A](a: A): Id[A] = {
+      println("Called pure on Id monad. Returning " + a)
+      a
+    }
+    override def flatMap[A, B](a: Id[A])(f: A => Id[B]): Id[B] = {
+      println("Called flatMap on Id monad. Flat mapping " + a)
+      f(a)
+    }
   }
 
   // Natural transformation definition
@@ -28,17 +34,31 @@ object Free {
   // Free monad definition
   sealed abstract class Free[F[_], A] {
     def flatMap[B](f: A => Free[F, B]): Free[F, B] = this match {
-      case Return(a) => f(a)
-      case Bind(fx, g) =>
+      case Return(a) => {
+        println(s"Called flatMap on Return(${a})")
+        f(a)
+      }
+      case Bind(fx, g) => {
+        println(s"Called flatMap on Bind(${fx}, ...)")
         Bind(fx, g andThen (_ flatMap f))
+      }
     }
 
-    def map[B](f: A => B): Free[F, B] = flatMap(a => Return(f(a)))
+    def map[B](f: A => B): Free[F, B] = {
+      println("Called map on free monad")
+      flatMap(a => Return(f(a)))
+    }
 
     def foldMap[G[_]: Monad](f: F ~> G): G[A] = this match {
-      case Return(a) => Monad[G].pure(a)
-      case Bind(fx, g) => Monad[G].flatMap(f(fx)) { a =>
-        g(a).foldMap(f)
+      case Return(a) => {
+        println(s"Called foldMap on Return(${a})")
+        Monad[G].pure(a)
+      }
+      case Bind(fx, g) => {
+        println(s"Called foldMap on Bind(${fx}, ...)")
+        Monad[G].flatMap(f(fx)) { a =>
+          g(a).foldMap(f)
+        }
       }
     }
   }
@@ -49,5 +69,8 @@ object Free {
 
   // I guessed this, and it seems to work. I'd like to know why! I thought I was going
   // to have to understand CoYoneda for this, but suspect this is a simple case?
-  def liftF[F[_], A](value: F[A]): Free[F, A] = Bind(value, (i: A) => Return(i))
+  def liftF[F[_], A](value: F[A]): Free[F, A] = {
+    println(s"Lifting ${value} into free monad")
+    Bind(value, (i: A) => Return(i))
+  }
 }
