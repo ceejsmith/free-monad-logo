@@ -47,7 +47,7 @@ object Free {
   case class Return[F[_], A](a: A) extends Free[F, A]
   case class Bind[F[_], I, A](a: F[I], f: I => Free[F, A]) extends Free[F, A]
 
-  // This was used with the Cats implementation, which reasons in terms of Pure, Suspend and FlatMapped
-  // Does it still make sense with an implementation using Return and Bind?
-  def liftF[F[_], A](value: F[A]): Free[F, A] = ???
+  // I guessed this, and it seems to work. I'd like to know why! I thought I was going
+  // to have to understand CoYoneda for this, but suspect this is a simple case?
+  def liftF[F[_], A](value: F[A]): Free[F, A] = Bind(value, (i: A) => Return(i))
 }

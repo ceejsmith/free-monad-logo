@@ -5,9 +5,9 @@ object Main {
     import Lifting._
     start: Position =>
       for {
-        p1 <- forward(start, 10)
-        p2 <- left(p1, Degree(90))
-        p3 <- forward(p2, 10)
+        p1 <- forward(start, 10.0)
+        p2 <- left(p1, Degree(45))
+        p3 <- forward(p2, 14.14213562373095)
         _ <- showPosition(p3)
       } yield p3
   }
